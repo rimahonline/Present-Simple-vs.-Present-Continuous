@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Present Simple vs Present Continuous | رحلة الأزمنة</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Poppins:wght@600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script>
+tailwind.config={
+  theme:{
+    extend:{
+      fontFamily:{'cairo':['Cairo','sans-serif'],'poppins':['Poppins','sans-serif']},
+      colors:{
+        'brand':{'navy':'#0f172a','violet':'#7c3aed','teal':'#14b8a6','amber':'#f59e0b','pink':'#ec4899'}
+      }
+    }
+  }
+}
+</script>
+<style>
+*{font-family:'Cairo',sans-serif}
+.font-en{font-family:'Poppins',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.flip-card{perspective:1200px}
+.flip-inner{transition:transform 0.7s cubic-bezier(0.4,0,0.2,1);transform-style:preserve-3d}
+.flip-card.flipped .flip-inner{transform:rotateY(180deg)}
+.face{backface-visibility:hidden}
+.face-back{transform:rotateY(180deg)}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:999px}
+.speaking{animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.glass{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.timeline-dot{box-shadow:0 0 0 4px rgba(124,58,237,0.15)}
+</style>
+</head>
+<body class="bg-[#f8fafc] text-slate-800 overflow-x-hidden">
+<!-- Header -->
+<header class="sticky top-0 z-50 bg-white/80 glass border-b border-slate-200">
+  <div class="max-w-[1280px] mx-auto px-4 md:px-6 py-3 flex items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-violet-200">
+        <i class="fa-solid fa-language text-lg"></i>
+      </div>
+      <div>
+        <h1 class="font-black text-[15px] md:text-[18px] leading-none text-slate-900">Present Tenses Lab</h1>
+        <p class="text-[11px] text-slate-500 font-semibold tracking-wide">المضارع البسيط vs المستمر</p>
+      </div>
+      <span class="hidden md:inline-flex ms-3 bg-amber-100 text-amber-700 text-[11px] font-bold px-3 py-1 rounded-full border border-amber-200"><i class="fa-solid fa-bolt me-1"></i> تفاعلي + نطق</span>
+    </div>
+    <div class="flex items-center gap-2 md:gap-3">
+      <div class="hidden md:flex items-center gap-3 bg-slate-900 text-white rounded-full px-4 py-2">
+        <div class="text-center">
+          <p class="text-[10px] opacity-70 leading-none">التقدم</p>
+          <p class="font-black text-sm leading-none" id="headerProgress">0%</p>
+        </div>
+        <div class="w-20 h-1.5 bg-white/20 rounded-full overflow-hidden">
+          <div id="headerBar" class="h-full bg-gradient-to-r from-violet-500 to-teal-400 rounded-full transition-all duration-700" style="width:0%"></div>
+        </div>
+        <div class="w-8 h-8 rounded-full bg-white text-slate-900 flex items-center justify-center font-black text-xs" id="headerScore">0/8</div>
+      </div>
+      <button onclick="speakText('Welcome to Present Simple versus Present Continuous lab!', 'en-US')" class="w-9 h-9 md:w-auto md:px-4 md:py-2 rounded-full bg-slate-900 text-white flex items-center justify-center gap-2 text-sm font-bold hover:bg-black transition">
+        <i class="fa-solid fa-volume-high"></i> <span class="hidden md:inline">استماع ترحيبي</span>
+      </button>
+    </div>
+  </div>
+  <!-- Tabs -->
+  <div class="max-w-[1280px] mx-auto px-2 md:px-6">
+    <div class="flex gap-1 md:gap-2 overflow-x-auto scrollbar-none py-2">
+      <button onclick="showTab('learn')" id="tab-learn" class="tab-btn active whitespace-nowrap px-4 md:px-5 py-2.5 rounded-full font-bold text-sm bg-slate-900 text-white shadow"><i class="fa-solid fa-graduation-cap me-1.5"></i> 1. القواعد</button>
+      <button onclick="showTab('visual')" id="tab-visual" class="tab-btn whitespace-nowrap px-4 md:px-5 py-2.5 rounded-full font-bold text-sm bg-white border border-slate-200 hover:bg-slate-50"><i class="fa-solid fa-chart-simple me-1.5"></i> المخطط الزمني</button>
+      <button onclick="showTab('cards')" id="tab-cards" class="tab-btn whitespace-nowrap px-4 md:px-5 py-2.5 rounded-full font-bold text-sm bg-white border border-slate-200 hover:bg-slate-50"><i class="fa-regular fa-clone me-1.5"></i> بطاقات تفاعلية</button>
+      <button onclick="showTab('quiz')" id="tab-quiz" class="tab-btn whitespace-nowrap px-4 md:px-5 py-2.5 rounded-full font-bold text-sm bg-white border border-slate-200 hover:bg-slate-50"><i class="fa-solid fa-pen-to-square me-1.5"></i> اختبر نفسك</button>
+      <button onclick="showTab('dash')" id="tab-dash" class="tab-btn whitespace-nowrap px-4 md:px-5 py-2.5 rounded-full font-bold text-sm bg-white border border-slate-200 hover:bg-slate-50"><i class="fa-solid fa-chart-pie me-1.5"></i> لوحة التحليل</button>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-[1280px] mx-auto px-4 md:px-6 py-6 md:py-8">
+  <!-- HERO -->
+  <div class="bg-gradient-to-br from-slate-900 via-[#1e1b4b] to-violet-900 rounded-[24px] md:rounded-[32px] p-5 md:p-8 text-white relative overflow-hidden mb-6">
+    <div class="absolute -top-20 -left-20 w-72 h-72 bg-violet-500/20 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-20 -right-20 w-72 h-72 bg-teal-400/20 rounded-full blur-3xl"></div>
+    <div class="relative grid md:grid-cols-[1.3fr_0.9fr] gap-6 items-center">
+      <div>
+        <div class="inline-flex items-center gap-2 bg-white/10 border border-white/15 rounded-full px-3 py-1.5 text-xs font-bold mb-3">
+          <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span> درس تفاعلي • Text-to-Speech • تغذية فورية
+        </div>
+        <h2 class="font-black text-[26px] md:text-[36px] leading-[1.05]">افهم الفرق <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-pink-400">مرة واحدة</span> وللأبد</h2>
+        <p class="text-white/70 mt-2 text-sm md:text-[15px] leading-6">Present Simple للعادات والحقائق، و Present Continuous لما يحدث <span class="text-white font-bold">الآن</span>. تعلم، اسمع، العب، واختبر نفسك مع تحليل بصري لحظي.</p>
+        <div class="flex flex-wrap gap-2 mt-4">
+          <span class="bg-white text-slate-900 rounded-full px-3 py-1.5 text-xs font-black flex items-center gap-1.5"><i class="fa-solid fa-repeat text-violet-600"></i> Habits & Routines</span>
+          <span class="bg-teal-400 text-slate-900 rounded-full px-3 py-1.5 text-xs font-black flex items-center gap-1.5"><i class="fa-solid fa-bolt"></i> Happening Now!</span>
+          <span class="bg-amber-400 text-slate-900 rounded-full px-3 py-1.5 text-xs font-black">am / is / are + V-ing</span>
+        </div>
+        <div class="flex gap-2 mt-5">
+          <button onclick="showTab('quiz')" class="bg-white text-slate-900 px-5 py-3 rounded-full font-black text-sm hover:bg-slate-100 transition flex items-center gap-2">ابدأ الاختبار <i class="fa-solid fa-arrow-left"></i></button>
+          <button onclick="showTab('cards')" class="bg-white/10 border border-white/20 px-5 py-3 rounded-full font-bold text-sm hover:bg-white/20 transition">جرّب البطاقات</button>
+        </div>
+      </div>
+      <div class="bg-white rounded-[20px] p-4 md:p-5 text-slate-900 shadow-2xl relative">
+        <div class="flex items-center justify-between mb-3">
+          <p class="font-black text-sm flex items-center gap-2"><span class="w-2 h-2 bg-emerald-500 rounded-full"></span> مقارنة سريعة</p>
+          <span class="text-[11px] bg-slate-900 text-white px-2.5 py-1 rounded-full font-bold">VS</span>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-600 text-white p-4 relative overflow-hidden">
+            <p class="text-[11px] font-bold opacity-80 tracking-widest">PRESENT SIMPLE</p>
+            <p class="font-black text-[13px] mt-1 leading-4">حقائق & عادات</p>
+            <p class="mono text-[11px] bg-white/15 rounded-lg px-2 py-1.5 mt-3">S + V(s/es)</p>
+            <p class="text-[11px] mt-2 opacity-90">I play • She plays</p>
+            <div class="flex flex-wrap gap-1 mt-3">
+              <span class="text-[10px] bg-white text-violet-700 font-bold px-2 py-1 rounded-full">always</span><span class="text-[10px] bg-white text-violet-700 font-bold px-2 py-1 rounded-full">every day</span><span class="text-[10px] bg-white text-violet-700 font-bold px-2 py-1 rounded-full">usually</span>
+            </div>
+            <button onclick="speakText('She plays tennis every Tuesday. This is Present Simple for habits.', 'en-US')" class="mt-3 w-full bg-white text-violet-700 rounded-full py-2 text-xs font-black hover:bg-slate-100 transition"><i class="fa-solid fa-play me-1"></i> استمع للمثال</button>
+          </div>
+          <div class="rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-500 text-white p-4 relative overflow-hidden">
+            <p class="text-[11px] font-bold opacity-80 tracking-widest">PRESENT CONTINUOUS</p>
+            <p class="font-black text-[13px] mt-1 leading-4">يحدث الآن</p>
+            <p class="mono text-[11px] bg-white/15 rounded-lg px-2 py-1.5 mt-3">S + am/is/are + V-ing</p>
+            <p class="text-[11px] mt-2 opacity-90">I am playing • She is playing</p>
+            <div class="flex flex-wrap gap-1 mt-3">
+              <span class="text-[10px] bg-white text-teal-700 font-bold px-2 py-1 rounded-full">now</span><span class="text-[10px] bg-white text-teal-700 font-bold px-2 py-1 rounded-full">at the moment</span><span class="text-[10px] bg-white text-teal-700 font-bold px-2 py-1 rounded-full">Look!</span>
+            </div>
+            <button onclick="speakText('Look! She is playing tennis right now. This is Present Continuous.', 'en-US')" class="mt-3 w-full bg-white text-teal-700 rounded-full py-2 text-xs font-black hover:bg-slate-100 transition"><i class="fa-solid fa-play me-1"></i> استمع للمثال</button>
+          </div>
+        </div>
+        <div class="mt-3 grid grid-cols-3 gap-2 text-center">
+          <div class="bg-slate-50 rounded-xl p-2 border border-slate-100">
+            <p class="text-[11px] font-bold text-slate-500">الدقة</p><p class="font-black text-violet-600" id="heroAccuracy">0%</p>
+          </div>
+          <div class="bg-slate-50 rounded-xl p-2 border border-slate-100">
+            <p class="text-[11px] font-bold text-slate-500">المحاولات</p><p class="font-black text-slate-900" id="heroAttempts">0</p>
+          </div>
+          <div class="bg-amber-50 rounded-xl p-2 border border-amber-100">
+            <p class="text-[11px] font-bold text-amber-700">السلسلة 🔥</p><p class="font-black text-amber-600" id="heroStreak">0</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEARN TAB -->
+  <section id="view-learn" class="space-y-6">
+    <div class="grid lg:grid-cols-2 gap-5">
+      <!-- Present Simple Card -->
+      <div class="bg-white rounded-[24px] border border-slate-200 overflow-hidden shadow-sm">
+        <div class="h-1.5 bg-gradient-to-r from-violet-600 to-indigo-500"></div>
+        <div class="p-5 md:p-6">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex gap-3">
+              <div class="w-11 h-11 rounded-xl bg-violet-600 text-white flex items-center justify-center text-lg"><i class="fa-solid fa-infinity"></i></div>
+              <div>
+                <h3 class="font-black text-[18px] leading-none">Present Simple</h3>
+                <p class="text-[12px] font-bold text-violet-600 mt-1">المضارع البسيط — للعادات والحقائق</p>
+                <p class="font-en text-[11px] text-slate-500 font-semibold">Used for habits, routines & permanent states</p>
+              </div>
+            </div>
+            <span class="bg-violet-50 text-violet-700 border border-violet-200 text-[11px] font-black px-2.5 py-1 rounded-full">habit</span>
+          </div>
+
+          <div class="mt-4 bg-slate-50 border border-slate-200 rounded-2xl p-4">
+            <p class="text-[11px] font-black tracking-widest text-slate-500">FORMULA</p>
+            <div class="mt-2 flex flex-wrap items-center gap-1.5 font-en font-bold text-sm">
+              <span class="bg-white border border-slate-200 rounded-full px-3 py-1.5">Subject</span><span class="text-slate-400">+</span>
+              <span class="bg-violet-600 text-white rounded-full px-3 py-1.5">Verb (s/es)</span><span class="text-slate-400">+</span>
+              <span class="bg-white border border-slate-200 rounded-full px-3 py-1.5">Complement</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 mt-3 text-xs">
+              <div class="bg-white border border-slate-200 rounded-xl p-2.5"><p class="font-bold text-slate-500">I / You / We / They</p><p class="font-en font-black text-slate-900">play • go • eat</p></div>
+              <div class="bg-white border border-slate-200 rounded-xl p-2.5"><p class="font-bold text-slate-500">He / She / It</p><p class="font-en font-black text-violet-600">plays • goes • eats</p></div>
+            </div>
+          </div>
+
+          <div class="mt-4 flex flex-wrap gap-1.5">
+            <span class="bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold px-3 py-1.5 rounded-full"><i class="fa-regular fa-clock me-1"></i>every day</span>
+            <span class="bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold px-3 py-1.5 rounded-full">always</span>
+            <span class="bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold px-3 py-1.5 rounded-full">usually</span>
+            <span class="bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold px-3 py-1.5 rounded-full">sometimes</span>
+            <span class="bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold px-3 py-1.5 rounded-full">never</span>
+          </div>
+
+          <div class="mt-4 bg-gradient-to-r from-violet-50 to-white border border-violet-100 rounded-2xl p-4 flex items-center justify-between gap-3">
+            <div>
+              <p class="font-en font-bold text-sm text-slate-900">She <span class="text-violet-600">drinks</span> coffee every morning.</p>
+              <p class="text-xs text-slate-500 font-semibold">هي تشرب القهوة كل صباح (عادة)</p>
+            </div>
+            <button onclick="speakText('She drinks coffee every morning.', 'en-US')" class="w-10 h-10 rounded-full bg-violet-600 text-white flex items-center justify-center hover:bg-violet-700 transition shrink-0"><i class="fa-solid fa-volume-high text-sm"></i></button>
+          </div>
+          <div class="mt-3 flex gap-2">
+            <button onclick="speakText('I usually walk to school. He always watches TV at night.', 'en-US')" class="flex-1 bg-slate-900 text-white rounded-full py-2.5 text-xs font-black hover:bg-black transition"><i class="fa-solid fa-play me-1"></i> Listen Example</button>
+            <button onclick="showTab('visual')" class="px-4 bg-white border border-slate-200 rounded-full py-2.5 text-xs font-bold hover:bg-slate-50">شاهد على الخط الزمني</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Present Continuous Card -->
+      <div class="bg-white rounded-[24px] border border-slate-200 overflow-hidden shadow-sm">
+        <div class="h-1.5 bg-gradient-to-r from-teal-500 to-emerald-500"></div>
+        <div class="p-5 md:p-6">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex gap-3">
+              <div class="w-11 h-11 rounded-xl bg-teal-500 text-white flex items-center justify-center text-lg"><i class="fa-solid fa-person-running"></i></div>
+              <div>
+                <h3 class="font-black text-[18px] leading-none">Present Continuous</h3>
+                <p class="text-[12px] font-bold text-teal-600 mt-1">المضارع المستمر — يحدث الآن</p>
+                <p class="font-en text-[11px] text-slate-500 font-semibold">Used for actions happening right now</p>
+              </div>
+            </div>
+            <span class="bg-teal-50 text-teal-700 border border-teal-200 text-[11px] font-black px-2.5 py-1 rounded-full">now</span>
+          </div>
+
+          <div class="mt-4 bg-slate-50 border border-slate-200 rounded-2xl p-4">
+            <p class="text-[11px] font-black tracking-widest text-slate-500">FORMULA</p>
+            <div class="mt-2 flex flex-wrap items-center gap-1.5 font-en font-bold text-sm">
+              <span class="bg-white border border-slate-200 rounded-full px-3 py-1.5">Subject</span><span class="text-slate-400">+</span>
+              <span class="bg-teal-500 text-white rounded-full px-3 py-1.5">am / is / are</span><span class="text-slate-400">+</span>
+              <span class="bg-slate-900 text-white rounded-full px-3 py-1.5">Verb-ing</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2 mt-3 text-xs text-center">
+              <div class="bg-white border border-slate-200 rounded-xl p-2.5"><p class="font-bold text-slate-500">I</p><p class="font-en font-black">am playing</p></div>
+              <div class="bg-white border border-slate-200 rounded-xl p-2.5"><p class="font-bold text-slate-500">He / She / It</p><p class="font-en font-black text-teal-600">is playing</p></div>
+              <div class="bg-white border border-slate-200 rounded-xl p-2.5"><p class="font-bold text-slate-500">We / You / They</p><p class="font-en font-black">are playing</p></div>
+            </div>
+          </div>
+
+          <div class="mt-4 flex flex-wrap gap-1.5">
+            <span class="bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold px-3 py-1.5 rounded-full">now</span>
+            <span class="bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold px-3 py-1.5 rounded-full">at the moment</span>
+            <span class="bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold px-3 py-1.5 rounded-full">Look!</span>
+            <span class="bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold px-3 py-1.5 rounded-full">Listen!</span>
+            <span class="bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold px-3 py-1.5 rounded-full">right now</span>
+          </div>
+
+          <div class="mt-4 bg-gradient-to-r from-teal-50 to-white border border-teal-100 rounded-2xl p-4 flex items-center justify-between gap-3">
+            <div>
+              <p class="font-en font-bold text-sm text-slate-900">She <span class="text-teal-600">is drinking</span> coffee now.</p>
+              <p class="text-xs text-slate-500 font-semibold">هي تشرب القهوة الآن (لحظي)</p>
+            </div>
+            <button onclick="speakText('She is drinking coffee now.', 'en-US')" class="w-10 h-10 rounded-full bg-teal-500 text-white flex items-center justify-center hover:bg-teal-600 transition shrink-0"><i class="fa-solid fa-volume-high text-sm"></i></button>
+          </div>
+          <div class="mt-3 flex gap-2">
+            <button onclick="speakText('Listen! Someone is knocking on the door right now.', 'en-US')" class="flex-1 bg-teal-500 text-white rounded-full py-2.5 text-xs font-black hover:bg-teal-600 transition"><i class="fa-solid fa-play me-1"></i> Listen Example</button>
+            <button onclick="showTab('visual')" class="px-4 bg-white border border-slate-200 rounded-full py-2.5 text-xs font-bold hover:bg-slate-50">شاهد على الخط الزمني</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Compare Table -->
+    <div class="bg-white rounded-[24px] border border-slate-200 overflow-hidden">
+      <div class="px-5 md:px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <h4 class="font-black text-sm flex items-center gap-2"><i class="fa-solid fa-table-columns text-slate-400"></i> جدول المقارنة الفورية</h4>
+        <span class="text-[11px] bg-slate-900 text-white px-2.5 py-1 rounded-full font-bold">Instant Check</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm min-w-[640px]">
+          <thead class="bg-slate-50 text-[11px] font-black tracking-widest text-slate-500">
+            <tr><th class="text-right px-6 py-3">العنصر</th><th class="text-center px-4 py-3"><span class="bg-violet-600 text-white px-3 py-1 rounded-full">Present Simple</span></th><th class="text-center px-4 py-3"><span class="bg-teal-500 text-white px-3 py-1 rounded-full">Present Continuous</span></th></tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-[13px]">
+            <tr><td class="px-6 py-3 font-bold">الاستخدام</td><td class="px-4 py-3 text-center font-semibold">عادات، حقائق، جدول ثابت</td><td class="px-4 py-3 text-center font-semibold">حدث يحدث الآن ومستمر</td></tr>
+            <tr class="bg-slate-50/50"><td class="px-6 py-3 font-bold">الكلمات المفتاحية</td><td class="px-4 py-3 text-center mono text-xs">always, usually, every day</td><td class="px-4 py-3 text-center mono text-xs">now, at the moment, Look!</td></tr>
+            <tr><td class="px-6 py-3 font-bold">المثال</td><td class="px-4 py-3 text-center font-en font-bold">He <u>works</u> every day.</td><td class="px-4 py-3 text-center font-en font-bold">He <u>is working</u> now.</td></tr>
+            <tr class="bg-slate-50/50"><td class="px-6 py-3 font-bold">المعنى</td><td class="px-4 py-3 text-center text-slate-600">هو يعمل كل يوم (عادة)</td><td class="px-4 py-3 text-center text-slate-600">هو يعمل الآن (لحظياً)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- VISUAL TAB -->
+  <section id="view-visual" class="hidden space-y-6">
+    <div class="grid lg:grid-cols-[1.6fr_0.9fr] gap-5">
+      <div class="bg-white rounded-[24px] border border-slate-200 p-5 md:p-6">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <h3 class="font-black text-lg flex items-center gap-2"><i class="fa-solid fa-wave-square text-violet-600"></i> الخط الزمني التفاعلي</h3>
+          <div class="flex bg-slate-100 rounded-full p-1">
+            <button onclick="setTimeline('simple')" id="btn-simple" class="px-4 py-1.5 rounded-full bg-violet-600 text-white text-xs font-black">Simple — عادة</button>
+            <button onclick="setTimeline('continuous')" id="btn-continuous" class="px-4 py-1.5 rounded-full text-xs font-bold text-slate-600">Continuous — الآن</button>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 border border-slate-200 rounded-[20px] p-5 md:p-6 relative overflow-hidden">
+          <!-- SVG Timeline -->
+          <svg viewBox="0 0 700 220" class="w-full h-auto">
+            <!-- axis -->
+            <line x1="40" y1="110" x2="660" y2="110" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
+            <!-- ticks -->
+            <g id="timeline-ticks" font-family="Poppins" font-size="11" fill="#64748b" font-weight="700">
+              <line x1="120" y1="100" x2="120" y2="120" stroke="#94a3b8" stroke-width="2"/><text x="120" y="135" text-anchor="middle">Yesterday</text>
+              <line x1="350" y1="100" x2="350" y2="120" stroke="#94a3b8" stroke-width="2"/><text x="350" y="135" text-anchor="middle">Today</text>
+              <line x1="580" y1="100" x2="580" y2="120" stroke="#94a3b8" stroke-width="2"/><text x="580" y="135" text-anchor="middle">Tomorrow</text>
+            </g>
+            <!-- simple repeated dots -->
+            <g id="simple-group">
+              <circle cx="90" cy="110" r="7" fill="#7c3aed" class="timeline-dot"/><circle cx="170" cy="110" r="7" fill="#7c3aed"/><circle cx="250" cy="110" r="7" fill="#7c3aed"/><circle cx="330" cy="110" r="7" fill="#7c3aed"/><circle cx="410" cy="110" r="7" fill="#7c3aed"/><circle cx="490" cy="110" r="7" fill="#7c3aed"/><circle cx="570" cy="110" r="7" fill="#7c3aed"/><circle cx="640" cy="110" r="7" fill="#7c3aed"/>
+              <path d="M90 110 Q 130 70 170 110 T 250 110 T 330 110 T 410 110 T 490 110 T 570 110 T 640 110" fill="none" stroke="#7c3aed" stroke-width="2" stroke-dasharray="6 6" opacity="0.5"/>
+              <g transform="translate(350,55)">
+                <rect x="-110" y="-22" width="220" height="34" rx="17" fill="#7c3aed"/>
+                <text x="0" y="-2" text-anchor="middle" fill="white" font-family="Cairo" font-size="11" font-weight="800">يتكرر كل يوم — Every day</text>
+              </g>
+            </g>
+            <!-- continuous highlight -->
+            <g id="continuous-group" opacity="0" style="transition:opacity .4s">
+              <rect x="300" y="85" width="100" height="50" rx="16" fill="#14b8a6" opacity="0.15"/>
+              <rect x="310" y="92" width="80" height="36" rx="12" fill="#14b8a6"/>
+              <text x="350" y="101" text-anchor="middle" fill="white" font-family="Poppins" font-size="10" font-weight="800">NOW</text>
+              <text x="350" y="114" text-anchor="middle" fill="white" font-family="Cairo" font-size="9" font-weight="700">الآن</text>
+              <circle cx="350" cy="110" r="10" fill="white" stroke="#14b8a6" stroke-width="3"/>
+              <g transform="translate(350,40)">
+                <rect x="-95" y="-18" width="190" height="28" rx="14" fill="#0f766e"/>
+                <text x="0" y="-1" text-anchor="middle" fill="white" font-family="Cairo" font-size="10" font-weight="800">يحدث في هذه اللحظة</text>
+              </g>
+              <!-- pulse -->
+              <circle cx="350" cy="110" r="18" fill="none" stroke="#14b8a6" stroke-width="2" opacity="0.4">
+                <animate attributeName="r" values="18;28;18" dur="1.6s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.4;0;0.4" dur="1.6s" repeatCount="indefinite"/>
+              </circle>
+            </g>
+          </svg>
+
+          <div class="grid md:grid-cols-2 gap-3 mt-4">
+            <div id="card-simple-desc" class="bg-white border-2 border-violet-200 rounded-2xl p-4">
+              <p class="font-black text-violet-700 text-sm flex items-center gap-2"><i class="fa-solid fa-infinity"></i> Present Simple — متكرر</p>
+              <p class="font-en text-xs font-bold text-slate-700 mt-1">She <span class="text-violet-600">walks</span> to school every day.</p>
+              <p class="text-xs text-slate-500">نقاط متكررة على الخط = عادة لا تتوقف.</p>
+              <button onclick="speakText('She walks to school every day.', 'en-US')" class="mt-2 text-xs font-black bg-violet-600 text-white px-3 py-1.5 rounded-full"><i class="fa-solid fa-volume-high me-1"></i> استمع</button>
+            </div>
+            <div id="card-continuous-desc" class="bg-white border border-slate-200 rounded-2xl p-4 opacity-60">
+              <p class="font-black text-teal-600 text-sm flex items-center gap-2"><i class="fa-solid fa-bolt"></i> Present Continuous — لحظي</p>
+              <p class="font-en text-xs font-bold text-slate-700 mt-1">She <span class="text-teal-600">is walking</span> to school now.</p>
+              <p class="text-xs text-slate-500">تركيز ضيق على لحظة NOW المضيئة.</p>
+              <button onclick="speakText('She is walking to school right now.', 'en-US')" class="mt-2 text-xs font-black bg-teal-500 text-white px-3 py-1.5 rounded-full"><i class="fa-solid fa-volume-high me-1"></i> استمع</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 flex flex-wrap gap-2 text-xs font-bold">
+          <span class="px-3 py-1.5 rounded-full bg-violet-50 border border-violet-200 text-violet-700">● Simple = خط متقطع متكرر</span>
+          <span class="px-3 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-700">● Continuous = بقعة مضيئة NOW</span>
+        </div>
+      </div>
+
+      <div class="space-y-5">
+        <div class="bg-white rounded-[24px] border border-slate-200 p-5">
+          <h4 class="font-black text-sm mb-3 flex items-center gap-2"><i class="fa-solid fa-lightbulb text-amber-500"></i> متى أختار؟</h4>
+          <div class="space-y-3">
+            <div class="flex gap-3 p-3 rounded-2xl bg-violet-50 border border-violet-100">
+              <div class="w-8 h-8 rounded-full bg-violet-600 text-white flex items-center justify-center shrink-0 text-xs"><i class="fa-solid fa-check"></i></div>
+              <div><p class="font-black text-xs">رأيت كلمة دالة على التكرار؟</p><p class="text-xs text-slate-600">every day / always / usually → <b class="text-violet-700">Present Simple</b></p></div>
+            </div>
+            <div class="flex gap-3 p-3 rounded-2xl bg-teal-50 border border-teal-100">
+              <div class="w-8 h-8 rounded-full bg-teal-500 text-white flex items-center justify-center shrink-0 text-xs"><i class="fa-solid fa-check"></i></div>
+              <div><p class="font-black text-xs">رأيت Look! / Listen! / now ؟</p><p class="text-xs text-slate-600">حدث أمام عينيك الآن → <b class="text-teal-700">Present Continuous</b></p></div>
+            </div>
+            <div class="flex gap-3 p-3 rounded-2xl bg-amber-50 border border-amber-100">
+              <div class="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0 text-xs"><i class="fa-solid fa-star"></i></div>
+              <div><p class="font-black text-xs">حقيقة علمية ثابتة؟</p><p class="text-xs text-slate-600">Water boils at 100° → <b>Simple</b> دائماً</p></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-900 rounded-[24px] p-5 text-white">
+          <h4 class="font-black text-sm mb-3">شريط الثقة</h4>
+          <div class="space-y-3 text-xs">
+            <div>
+              <div class="flex justify-between font-bold mb-1"><span>Present Simple</span><span id="confSimple" class="text-violet-300">0%</span></div>
+              <div class="h-2 bg-white/10 rounded-full overflow-hidden"><div id="barSimple" class="h-full bg-violet-500 rounded-full transition-all duration-700" style="width:0%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between font-bold mb-1"><span>Present Continuous</span><span id="confCont" class="text-teal-300">0%</span></div>
+              <div class="h-2 bg-white/10 rounded-full overflow-hidden"><div id="barCont" class="h-full bg-teal-400 rounded-full transition-all duration-700" style="width:0%"></div></div>
+            </div>
+          </div>
+          <p class="text-[11px] text-white/60 mt-3 leading-4">يتحدث الشريط تلقائياً حسب نتائجك في الاختبار. كلما أخطأت في زمن، انخفضت ثقتك فيه.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CARDS TAB -->
+  <section id="view-cards" class="hidden space-y-5">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <h3 class="font-black text-lg flex items-center gap-2"><i class="fa-regular fa-clone text-violet-600"></i> بطاقات تفاعلية — اقلب واستمع</h3>
+      <div class="flex gap-2">
+        <button onclick="shuffleCards()" class="px-4 py-2 rounded-full bg-white border border-slate-200 text-xs font-black hover:bg-slate-50"><i class="fa-solid fa-shuffle me-1"></i> خلط</button>
+        <button onclick="speakText('Flip the cards and guess the correct tense.', 'en-US')" class="px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-black"><i class="fa-solid fa-volume-high me-1"></i> تعليمات صوتية</button>
+      </div>
+    </div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4" id="cardsGrid">
+      <!-- cards injected by JS -->
+    </div>
+    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-amber-500 text-white flex items-center justify-center"><i class="fa-solid fa-ear-listen"></i></div>
+      <p class="text-sm font-bold text-amber-900">اضغط على <b>اقلب البطاقة</b> لتكشف الإجابة، ثم اضغط <b>استمع</b> لتسمع النطق الصحيح بـ Text-to-Speech بدون ملفات خارجية.</p>
+    </div>
+  </section>
+
+  <!-- QUIZ TAB -->
+  <section id="view-quiz" class="hidden space-y-5">
+    <div class="grid lg:grid-cols-[1.7fr_0.9fr] gap-5">
+      <div class="bg-white rounded-[24px] border border-slate-200 p-5 md:p-6">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <h3 class="font-black text-lg flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-violet-600"></i> Practice & Test Yourself</h3>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-black bg-slate-900 text-white px-3 py-1.5 rounded-full" id="quizProgress">1 / 8</span>
+            <button onclick="resetQuiz()" class="text-xs font-bold px-3 py-1.5 rounded-full border border-slate-200 hover:bg-slate-50"><i class="fa-solid fa-rotate me-1"></i> إعادة</button>
+          </div>
+        </div>
+
+        <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden mb-5">
+          <div id="quizBar" class="h-full bg-gradient-to-r from-violet-600 to-teal-500 rounded-full transition-all duration-500" style="width:12.5%"></div>
+        </div>
+
+        <div id="quizContainer" class="space-y-4">
+          <!-- question injected -->
+        </div>
+
+        <div id="quizFeedback" class="hidden mt-4 rounded-2xl p-4 border-2"></div>
+
+        <div class="flex gap-2 mt-5">
+          <button id="nextBtn" onclick="nextQuestion()" class="hidden flex-1 bg-slate-900 text-white rounded-full py-3 font-black text-sm hover:bg-black transition">التالي <i class="fa-solid fa-arrow-left ms-2"></i></button>
+          <button onclick="showTab('dash')" class="px-5 py-3 rounded-full border border-slate-200 font-bold text-sm hover:bg-slate-50">عرض التحليل <i class="fa-solid fa-chart-pie ms-1"></i></button>
+        </div>
+      </div>
+
+      <div class="space-y-5">
+        <div class="bg-white rounded-[24px] border border-slate-200 p-5">
+          <h4 class="font-black text-sm mb-3">توزيع الأسئلة</h4>
+          <canvas id="quizChart" height="190"></canvas>
+        </div>
+        <div class="bg-gradient-to-br from-violet-600 to-indigo-600 rounded-[24px] p-5 text-white">
+          <h4 class="font-black text-sm flex items-center gap-2"><i class="fa-solid fa-trophy text-amber-300"></i> نتيجتك الحالية</h4>
+          <div class="grid grid-cols-3 gap-2 mt-4 text-center">
+            <div class="bg-white/10 rounded-2xl p-3 border border-white/10"><p class="text-2xl font-black" id="scoreCorrect">0</p><p class="text-[11px] opacity-80 font-bold">صحيحة</p></div>
+            <div class="bg-white/10 rounded-2xl p-3 border border-white/10"><p class="text-2xl font-black" id="scoreWrong">0</p><p class="text-[11px] opacity-80 font-bold">خاطئة</p></div>
+            <div class="bg-white rounded-2xl p-3 text-slate-900"><p class="text-2xl font-black" id="scorePct">0%</p><p class="text-[11px] font-bold text-slate-500">الدقة</p></div>
+          </div>
+          <div class="mt-4 bg-white/10 rounded-full h-2 overflow-hidden"><div id="scoreBar" class="h-full bg-amber-400 rounded-full transition-all" style="width:0%"></div></div>
+          <p class="text-xs text-white/70 mt-3 font-semibold" id="scoreMsg">ابدأ الاختبار لتحصل على تحليل فوري لكل زمن.</p>
+        </div>
+        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+          <p class="font-black text-sm text-amber-900 flex items-center gap-2"><i class="fa-solid fa-circle-info text-amber-600"></i> كيف تحصل على تغذية فورية؟</p>
+          <p class="text-xs text-amber-800 leading-5 mt-1">عند اختيار إجابة، يظهر لك فوراً: <b>صح/خطأ + السبب + القاعدة + مثال منطوق</b> مع تحديث المخططات.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD TAB -->
+  <section id="view-dash" class="hidden space-y-5">
+    <div class="grid lg:grid-cols-3 gap-5">
+      <div class="bg-white rounded-[24px] border border-slate-200 p-5 flex flex-col items-center text-center">
+        <p class="text-xs font-black tracking-widest text-slate-500">OVERALL ACCURACY</p>
+        <div class="relative w-48 h-48 mt-3">
+          <canvas id="donutChart" width="190" height="190"></canvas>
+          <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            <p class="font-black text-3xl" id="donutCenter">0%</p>
+            <p class="text-[11px] font-bold text-slate-500">دقة عامة</p>
+          </div>
+        </div>
+        <div class="flex gap-2 mt-3 text-xs font-bold">
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-violet-600"></span> Simple</span>
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-teal-500"></span> Continuous</span>
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-slate-200"></span> متبقي</span>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-[24px] border border-slate-200 p-5">
+        <h4 class="font-black text-sm mb-3">الأداء حسب الزمن</h4>
+        <canvas id="barChart" height="220"></canvas>
+        <div class="grid grid-cols-2 gap-2 mt-4">
+          <div class="bg-violet-50 border border-violet-100 rounded-xl p-3 text-center"><p class="text-[11px] font-bold text-violet-700">Present Simple</p><p class="font-black text-violet-700 text-lg" id="dashSimple">0 / 0</p></div>
+          <div class="bg-teal-50 border border-teal-100 rounded-xl p-3 text-center"><p class="text-[11px] font-bold text-teal-700">Present Continuous</p><p class="font-black text-teal-600 text-lg" id="dashCont">0 / 0</p></div>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 rounded-[24px] p-5 text-white flex flex-col">
+        <h4 class="font-black text-sm flex items-center gap-2"><i class="fa-solid fa-fire text-amber-400"></i> ملخص تفاعلي</h4>
+        <div class="mt-4 space-y-3 text-sm">
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
+            <p class="text-white/60 text-xs font-bold">الحالة</p>
+            <p class="font-black text-base mt-1" id="dashStatus">ابدأ الاختبار لرؤية تحليلك</p>
+            <p class="text-xs text-white/60 mt-1 leading-5" id="dash Advice">سيتم توليد نصيحة مخصصة حسب أخطائك: هل تخلط بين always و now؟</p>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div class="bg-white text-slate-900 rounded-2xl p-3 text-center"><p class="text-[11px] font-bold text-slate-500">الأسئلة المجابة</p><p class="font-black text-xl" id="dashAnswered">0 / 8</p></div>
+            <div class="bg-amber-400 text-slate-900 rounded-2xl p-3 text-center"><p class="text-[11px] font-bold">أفضل سلسلة</p><p class="font-black text-xl" id="dashStreak">0 🔥</p></div>
+          </div>
+          <button onclick="showTab('quiz')" class="w-full mt-2 bg-white text-slate-900 rounded-full py-3 font-black text-sm hover:bg-slate-100 transition">متابعة التدريب</button>
+          <button onclick="resetQuiz()" class="w-full bg-white/10 border border-white/15 rounded-full py-3 font-bold text-sm hover:bg-white/20 transition">إعادة تعيين البيانات</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-[24px] border border-slate-200 p-5 md:p-6">
+      <h4 class="font-black text-sm mb-4 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-slate-400"></i> سجل الإجابات (تغذية فورية محفوظة)</h4>
+      <div id="historyList" class="grid md:grid-cols-2 gap-3">
+        <p class="text-sm text-slate-500 font-semibold col-span-2 text-center py-8 bg-slate-50 rounded-2xl border border-dashed border-slate-200">لا يوجد سجل بعد — أجب على الأسئلة ليظهر التحليل هنا مع الشرح لكل سؤال.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="max-w-[1280px] mx-auto px-4 md:px-6 pb-8">
+  <div class="bg-white border border-slate-200 rounded-[20px] px-5 py-4 flex flex-wrap items-center justify-between gap-3 text-xs font-bold text-slate-500">
+    <p>© 2025 Present Tenses Lab — تعلم تفاعلي مع Web Speech API • بدون ملفات صوتية خارجية</p>
+    <p class="flex items-center gap-2"><span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span> يعمل بدون إنترنت بعد التحميل • متجاوب 100%</p>
+  </div>
+</footer>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-5 py-3 rounded-full text-sm font-bold shadow-2xl hidden items-center gap-2 z-50"><i class="fa-solid fa-check bg-emerald-500 w-6 h-6 rounded-full flex items-center justify-center text-xs"></i> <span id="toastMsg">تم الحفظ</span></div>
+
+<script>
+// ----- Data -----
+const cardsData = [
+  {en:"I usually drink coffee in the morning.", ar:"أنا عادة أشرب القهوة صباحاً", tense:"Present Simple", clue:"usually", color:"violet"},
+  {en:"She is drinking coffee right now.", ar:"هي تشرب القهوة الآن", tense:"Present Continuous", clue:"right now", color:"teal"},
+  {en:"He plays football every Friday.", ar:"هو يلعب كرة القدم كل جمعة", tense:"Present Simple", clue:"every Friday", color:"violet"},
+  {en:"Look! He is playing football now!", ar:"انظر! هو يلعب كرة القدم الآن!", tense:"Present Continuous", clue:"Look! + now", color:"teal"},
+  {en:"Water boils at 100 degrees.", ar:"الماء يغلي عند 100 درجة (حقيقة)", tense:"Present Simple", clue:"Fact", color:"violet"},
+  {en:"Listen! The baby is crying.", ar:"اسمع! الطفل يبكي الآن", tense:"Present Continuous", clue:"Listen!", color:"teal"},
+];
+
+const questions = [
+  {q:"Look! The cat _______ on the sofa right now.", opts:["sleeps","is sleeping","slept"], ans:1, tense:"continuous", exp:"كلمتا Look! و right now تدلان على حدث يحدث أمام عينيك الآن → is sleeping (is + V-ing).", ex:"Look! The cat is sleeping on the sofa right now."},
+  {q:"She usually _______ to school by bus.", opts:["is going","goes","go"], ans:1, tense:"simple", exp:"usually عادة متكررة + الفاعل She مفرد → نضيف s → goes.", ex:"She usually goes to school by bus."},
+  {q:"Listen! Someone _______ the piano.", opts:["is playing","plays","play"], ans:0, tense:"continuous", exp:"Listen! نستخدمها لجذب الانتباه لحدث يحدث الآن → is playing.", ex:"Listen! Someone is playing the piano."},
+  {q:"Water _______ at 100°C.", opts:["boils","is boiling","boil"], ans:0, tense:"simple", exp:"حقيقة علمية ثابتة لا تتغير → Present Simple: boils.", ex:"Water boils at 100 degrees Celsius."},
+  {q:"I _______ my homework at the moment.", opts:["do","am doing","does"], ans:1, tense:"continuous", exp:"at the moment = في هذه اللحظة → am doing.", ex:"I am doing my homework at the moment."},
+  {q:"Ahmed _______ football every Friday.", opts:["plays","is playing","are playing"], ans:0, tense:"simple", exp:"every Friday عادة أسبوعية → plays (s مع المفرد).", ex:"Ahmed plays football every Friday."},
+  {q:"They _______ in London this week (مؤقتاً).", opts:["live","are living","lives"], ans:1, tense:"continuous", exp:"حدث مؤقت هذا الأسبوع وليس دائم → are living.", ex:"They are living in London this week."},
+  {q:"My father _______ coffee every morning.", opts:["is drinking","drinks","drink"], ans:1, tense:"simple", exp:"every morning عادة يومية → drinks.", ex:"My father drinks coffee every morning."},
+];
+
+// ----- State -----
+let currentQ = 0;
+let answers = []; // {idx, correct, tense}
+let bestStreak = 0, curStreak = 0;
+let simpleCorrect=0, simpleTotal=0, contCorrect=0, contTotal=0;
+
+// ----- Speech -----
+function speakText(text, lang='en-US'){
+  if(!('speechSynthesis' in window)){ showToast('المتصفح لا يدعم النطق'); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang;
+  u.rate = 0.92;
+  u.pitch = 1;
+  // pick English voice if available
+  const voices = speechSynthesis.getVoices();
+  const enVoice = voices.find(v=>v.lang.includes('en')) || voices[0];
+  if(enVoice) u.voice = enVoice;
+  const btn = document.activeElement;
+  if(btn) btn.classList.add('speaking');
+  u.onend = ()=>{ if(btn) btn.classList.remove('speaking'); };
+  speechSynthesis.speak(u);
+}
+window.speechSynthesis.onvoiceschanged = ()=> speechSynthesis.getVoices();
+
+// ----- Tabs -----
+function showTab(name){
+  document.querySelectorAll('[id^="view-"]').forEach(e=>e.classList.add('hidden'));
+  document.getElementById('view-'+name).classList.remove('hidden');
+  document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('bg-slate-900','text-white','shadow'); b.classList.add('bg-white','border','border-slate-200')});
+  const active = document.getElementById('tab-'+name);
+  active.classList.add('bg-slate-900','text-white','shadow'); active.classList.remove('bg-white','border','border-slate-200');
+  if(name==='dash') updateDashboard();
+  if(name==='quiz') renderQuestion();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ----- Timeline -----
+function setTimeline(mode){
+  const sg = document.getElementById('simple-group');
+  const cg = document.getElementById('continuous-group');
+  const bs = document.getElementById('btn-simple');
+  const bc = document.getElementById('btn-continuous');
+  const cs = document.getElementById('card-simple-desc');
+  const cc = document.getElementById('card-continuous-desc');
+  if(mode==='simple'){
+    sg.style.opacity='1'; cg.style.opacity='0';
+    bs.className='px-4 py-1.5 rounded-full bg-violet-600 text-white text-xs font-black';
+    bc.className='px-4 py-1.5 rounded-full text-xs font-bold text-slate-600';
+    cs.classList.remove('opacity-60','border-slate-200'); cs.classList.add('border-violet-200','border-2');
+    cc.classList.add('opacity-60'); cc.classList.remove('border-2','border-teal-200'); cc.classList.add('border-slate-200');
+  } else {
+    sg.style.opacity='0.18'; cg.style.opacity='1';
+    bc.className='px-4 py-1.5 rounded-full bg-teal-500 text-white text-xs font-black';
+    bs.className='px-4 py-1.5 rounded-full text-xs font-bold text-slate-600';
+    cc.classList.remove('opacity-60','border-slate-200'); cc.classList.add('border-teal-200','border-2');
+    cs.classList.add('opacity-60'); cs.classList.remove('border-2','border-violet-200'); cs.classList.add('border-slate-200');
+  }
+}
+
+// ----- Cards -----
+function renderCards(){
+  const grid = document.getElementById('cardsGrid');
+  grid.innerHTML = cardsData.map((c,i)=>`
+  <div class="flip-card bg-transparent h-[220px] cursor-pointer" onclick="this.classList.toggle('flipped')">
+    <div class="flip-inner relative w-full h-full">
+      <div class="face absolute inset-0 bg-white border border-slate-200 rounded-[20px] p-4 flex flex-col shadow-sm">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-black px-2.5 py-1 rounded-full ${c.color==='violet'?'bg-violet-600 text-white':'bg-teal-500 text-white'}">${c.tense}</span>
+          <span class="text-[11px] font-bold bg-amber-50 border border-amber-200 text-amber-800 px-2.5 py-1 rounded-full">${c.clue}</span>
+        </div>
+        <div class="flex-1 flex flex-col justify-center text-center mt-2">
+          <p class="font-en font-bold text-[15px] leading-6 text-slate-900">"${c.en}"</p>
+          <p class="text-xs font-bold text-slate-500 mt-1">${c.ar}</p>
+        </div>
+        <button class="mt-3 w-full bg-slate-900 text-white rounded-full py-2 text-xs font-black"><i class="fa-solid fa-rotate me-1"></i> اقلب البطاقة</button>
+      </div>
+      <div class="face face-back absolute inset-0 rounded-[20px] p-4 flex flex-col ${c.color==='violet'?'bg-gradient-to-br from-violet-600 to-indigo-600 text-white':'bg-gradient-to-br from-teal-500 to-emerald-500 text-white'} shadow-lg">
+        <p class="text-[11px] font-bold opacity-80 tracking-widest">${c.tense.toUpperCase()}</p>
+        <p class="font-en font-bold text-[14px] leading-5 mt-2">"${c.en}"</p>
+        <p class="text-xs font-semibold opacity-90 mt-1">${c.ar}</p>
+        <div class="mt-auto flex gap-2">
+          <button onclick="event.stopPropagation(); speakText('${c.en.replace(/'/g,"\\'")}', 'en-US')" class="flex-1 bg-white ${c.color==='violet'?'text-violet-700':'text-teal-700'} rounded-full py-2.5 text-xs font-black hover:bg-slate-100 transition"><i class="fa-solid fa-volume-high me-1"></i> استمع</button>
+          <button onclick="event.stopPropagation(); this.closest('.flip-card').classList.remove('flipped')" class="px-4 bg-white/15 border border-white/20 rounded-full py-2.5 text-xs font-bold">رجوع</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  `).join('');
+}
+function shuffleCards(){
+  for(let i=cardsData.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [cardsData[i],cardsData[j]]=[cardsData[j],cardsData[i]]}
+  renderCards(); showToast('تم خلط البطاقات');
+}
+
+// ----- Quiz -----
+let quizChartInstance=null;
+function initQuizChart(){
+  const ctx = document.getElementById('quizChart').getContext('2d');
+  quizChartInstance = new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels:['Simple','Continuous'],
+      datasets:[
+        {label:'صحيحة', data:[0,0], backgroundColor:['#7c3aed','#14b8a6'], borderRadius:10, barThickness:28},
+        {label:'خاطئة', data:[0,0], backgroundColor:['#ede9fe','#ccfbf1'], borderRadius:10, barThickness:28}
+      ]
+    },
+    options:{
+      maintainAspectRatio:true,
+      responsive:true,
+      plugins:{legend:{display:false}, tooltip:{enabled:true}},
+      scales:{
+        x:{grid:{display:false}, ticks:{font:{family:'Cairo', weight:'700'}}},
+        y:{beginAtZero:true, max:4, ticks:{stepSize:1}, grid:{color:'#f1f5f9'}}
+      }
+    }
+  });
+}
+function renderQuestion(){
+  const q = questions[currentQ];
+  const answered = answers[currentQ];
+  document.getElementById('quizProgress').textContent = (currentQ+1)+' / '+questions.length;
+  document.getElementById('quizBar').style.width = ((currentQ+1)/questions.length*100)+'%';
+  const container = document.getElementById('quizContainer');
+  container.innerHTML = `
+    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 md:p-5">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-[11px] font-black px-2.5 py-1 rounded-full ${q.tense==='simple'?'bg-violet-600 text-white':'bg-teal-500 text-white'}">${q.tense==='simple'?'Present Simple':'Present Continuous'}</span>
+        <span class="text-xs font-bold text-slate-500">سؤال ${currentQ+1}</span>
+        <button onclick="speakText('${q.ex.replace(/'/g,"\\'")}', 'en-US')" class="ms-auto w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center hover:bg-slate-50"><i class="fa-solid fa-volume-high text-xs"></i></button>
+      </div>
+      <p class="font-en font-bold text-[16px] md:text-[18px] leading-7 text-slate-900">${q.q.replace('_______','<span class="inline-block bg-amber-100 border border-amber-200 rounded-full px-3 py-0.5 mono text-sm">_______</span>')}</p>
+      <p class="text-xs font-semibold text-slate-500 mt-1">اختر الإجابة الصحيحة — ستحصل على شرح فوري</p>
+    </div>
+    <div class="grid gap-2.5">
+      ${q.opts.map((opt,i)=>`
+        <button onclick="answer(${i})" id="opt-${i}" class="opt-btn w-full text-start bg-white border-2 border-slate-200 rounded-2xl px-4 py-3.5 flex items-center gap-3 hover:border-slate-300 transition ${answered!==undefined ? (i===q.ans?'!border-emerald-400 !bg-emerald-50': (i===answered.idx && !answered.correct ? '!border-rose-400 !bg-rose-50' : 'opacity-60')) : ''}">
+          <span class="w-8 h-8 rounded-full flex items-center justify-center font-black text-sm shrink-0 ${answered!==undefined && i===q.ans ? 'bg-emerald-500 text-white' : answered!==undefined && i===answered.idx && !answered.correct ? 'bg-rose-500 text-white' : 'bg-slate-900 text-white'}">${String.fromCharCode(65+i)}</span>
+          <span class="font-en font-bold text-sm flex-1">${opt}</span>
+          ${answered!==undefined && i===q.ans ? '<i class="fa-solid fa-check text-emerald-600"></i>' : ''}
+          ${answered!==undefined && i===answered.idx && !answered.correct ? '<i class="fa-solid fa-xmark text-rose-600"></i>' : ''}
+        </button>
+      `).join('')}
+    </div>
+  `;
+  const fb = document.getElementById('quizFeedback');
+  const next = document.getElementById('nextBtn');
+  if(answered!==undefined){
+    showFeedback(answered.correct, q);
+    next.classList.remove('hidden');
+    if(currentQ===questions.length-1) next.innerHTML='عرض النتيجة <i class="fa-solid fa-chart-pie ms-2"></i>';
+    else next.innerHTML='التالي <i class="fa-solid fa-arrow-left ms-2"></i>';
+  } else {
+    fb.classList.add('hidden');
+    next.classList.add('hidden');
+  }
+  updateScores();
+}
+function answer(idx){
+  if(answers[currentQ]!==undefined) return;
+  const q = questions[currentQ];
+  const correct = idx===q.ans;
+  answers[currentQ]= {idx, correct, tense:q.tense};
+  // streak
+  if(correct){ curStreak++; bestStreak=Math.max(bestStreak, curStreak);} else curStreak=0;
+  // counts
+  if(q.tense==='simple'){ simpleTotal++; if(correct) simpleCorrect++; } else { contTotal++; if(correct) contCorrect++; }
+  renderQuestion();
+  showFeedback(correct,q);
+  document.getElementById('nextBtn').classList.remove('hidden');
+  updateScores();
+  updateCharts();
+  speakText(q.ex, 'en-US');
+  if(correct) showToast('إجابة صحيحة! 🎉'); else showToast('إجابة خاطئة — اقرأ الشرح');
+}
+function showFeedback(correct,q){
+  const fb=document.getElementById('quizFeedback');
+  fb.classList.remove('hidden');
+  if(correct){
+    fb.className='mt-4 rounded-2xl p-4 border-2 bg-emerald-50 border-emerald-200';
+    fb.innerHTML=`<div class="flex gap-3"><div class="w-9 h-9 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-check"></i></div><div><p class="font-black text-emerald-800 text-sm">أحسنت! إجابة صحيحة</p><p class="text-xs font-semibold text-emerald-900/80 leading-5 mt-1">${q.exp}</p><p class="mono text-xs bg-white border border-emerald-200 rounded-full inline-block px-3 py-1 mt-2 font-bold">✔ ${q.ex}</p></div></div>`;
+  } else {
+    fb.className='mt-4 rounded-2xl p-4 border-2 bg-rose-50 border-rose-200';
+    fb.innerHTML=`<div class="flex gap-3"><div class="w-9 h-9 rounded-full bg-rose-500 text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-xmark"></i></div><div><p class="font-black text-rose-800 text-sm">ليست صحيحة — لكن ستتعلم!</p><p class="text-xs font-semibold text-rose-900/80 leading-5 mt-1">${q.exp}</p><p class="mono text-xs bg-white border border-rose-200 rounded-full inline-block px-3 py-1 mt-2 font-bold">الإجابة: ${q.opts[q.ans]} — ${q.ex}</p></div></div>`;
+  }
+}
+function nextQuestion(){
+  if(currentQ < questions.length-1){ currentQ++; renderQuestion(); window.scrollTo({top:0,behavior:'smooth'});}
+  else { showTab('dash'); }
+}
+function resetQuiz(){
+  currentQ=0; answers=[]; curStreak=0; simpleCorrect=0; simpleTotal=0; contCorrect=0; contTotal=0;
+  updateScores(); updateCharts(); renderQuestion(); updateDashboard(); showToast('تمت إعادة الاختبار');
+}
+function updateScores(){
+  const correct = answers.filter(a=>a && a.correct).length;
+  const totalAns = answers.filter(a=>a!==undefined).length;
+  const pct = totalAns ? Math.round(correct/totalAns*100) : 0;
+  document.getElementById('scoreCorrect').textContent = correct;
+  document.getElementById('scoreWrong').textContent = totalAns - correct;
+  document.getElementById('scorePct').textContent = pct + '%';
+  document.getElementById('scoreBar').style.width = pct + '%';
+  document.getElementById('headerProgress').textContent = pct + '%';
+  document.getElementById('headerBar').style.width = pct + '%';
+  document.getElementById('headerScore').textContent = correct + '/' + questions.length;
+  document.getElementById('heroAccuracy').textContent = pct + '%';
+  document.getElementById('heroAttempts').textContent = totalAns;
+  document.getElementById('heroStreak').textContent = bestStreak;
+  document.getElementById('scoreMsg').textContent = totalAns===0 ? 'ابدأ الاختبار لتحصل على تحليل فوري لكل زمن.' : (pct>=75 ? 'ممتاز! استمر بنفس المستوى.' : pct>=50 ? 'جيد، ركّز على الكلمات المفتاحية.' : 'لا بأس، راجع القواعد ثم أعد المحاولة.');
+  // confidence bars
+  const sPct = simpleTotal? Math.round(simpleCorrect/simpleTotal*100):0;
+  const cPct = contTotal? Math.round(contCorrect/contTotal*100):0;
+  const sBar = document.getElementById('barSimple'), cBar=document.getElementById('barCont');
+  if(sBar){ sBar.style.width=sPct+'%'; document.getElementById('confSimple').textContent=sPct+'%';}
+  if(cBar){ cBar.style.width=cPct+'%'; document.getElementById('confCont').textContent=cPct+'%';}
+}
+
+// ----- Charts -----
+let donut, bar;
+function initCharts(){
+  const dctx = document.getElementById('donutChart').getContext('2d');
+  donut = new Chart(dctx, {
+    type:'doughnut',
+    data:{
+      labels:['Simple صح','Continuous صح','متبقي'],
+      datasets:[{data:[0,0,8], backgroundColor:['#7c3aed','#14b8a6','#e2e8f0'], borderWidth:0, cutout:'72%'}]
+    },
+    options:{
+      maintainAspectRatio:true,
+      responsive:true,
+      plugins:{legend:{display:false}, tooltip:{enabled:true}},
+    }
+  });
+  const bctx = document.getElementById('barChart').getContext('2d');
+  bar = new Chart(bctx, {
+    type:'bar',
+    data:{
+      labels:['Simple','Continuous'],
+      datasets:[
+        {label:'صحيحة', data:[0,0], backgroundColor:['#7c3aed','#14b8a6'], borderRadius:10},
+        {label:'خاطئة', data:[0,0], backgroundColor:['#f1f5f9','#f1f5f9'], borderRadius:10, borderColor:['#ddd6fe','#99f6e4'], borderWidth:1}
+      ]
+    },
+    options:{
+      maintainAspectRatio:true,
+      responsive:true,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{display:false}},
+        y:{beginAtZero:true, max:4, ticks:{stepSize:1}, grid:{color:'#f1f5f9'}}
+      }
+    }
+  });
+}
+function updateCharts(){
+  if(!donut || !bar) return;
+  const correct = answers.filter(a=>a && a.correct).length;
+  const sOk = simpleCorrect, cOk = contCorrect;
+  const remaining = questions.length - answers.filter(a=>a!==undefined).length;
+  donut.data.datasets[0].data = [sOk, cOk, remaining + (answers.filter(a=>a!==undefined).length - correct)];
+  // trick: keep remaining slice visible
+  const totalWrong = answers.filter(a=>a && !a.correct).length;
+  donut.data.datasets[0].data = [sOk, cOk, totalWrong + (questions.length - answers.filter(a=>a!==undefined).length)];
+  if(donut.data.datasets[0].data.reduce((a,b)=>a+b,0)===0) donut.data.datasets[0].data=[0,0,8];
+  donut.update();
+
+  bar.data.datasets[0].data = [sOk, cOk];
+  bar.data.datasets[1].data = [simpleTotal - sOk, contTotal - cOk];
+  bar.update();
+
+  if(quizChartInstance){
+    quizChartInstance.data.datasets[0].data=[sOk, cOk];
+    quizChartInstance.data.datasets[1].data=[simpleTotal - sOk, contTotal - cOk];
+    quizChartInstance.update();
+  }
+  const pct = answers.filter(a=>a!==undefined).length ? Math.round(correct/answers.filter(a=>a!==undefined).length*100):0;
+  document.getElementById('donutCenter').textContent = pct + '%';
+}
+function updateDashboard(){
+  const totalAns = answers.filter(a=>a!==undefined).length;
+  const correct = answers.filter(a=>a && a.correct).length;
+  document.getElementById('dashAnswered').textContent = totalAns + ' / 8';
+  document.getElementById('dashStreak').textContent = bestStreak + ' 🔥';
+  document.getElementById('dashSimple').textContent = simpleCorrect + ' / ' + (simpleTotal||0);
+  document.getElementById('dashCont').textContent = contCorrect + ' / ' + (contTotal||0);
+  const pct = totalAns? Math.round(correct/totalAns*100):0;
+  let status='ابدأ الاختبار لرؤية تحليلك', advice='سيتم توليد نصيحة مخصصة حسب أخطائك.';
+  if(totalAns>0){
+    if(pct>=85){status='مستوى متقدم 🚀'; advice='تفوقت! جرّب كتابة جُملك الخاصة بالزمنين ثم استمع لها.';}
+    else if(pct>=60){status='مستوى جيد 👍'; advice='ركّز على الكلمات المفتاحية: always/usually مقابل now/Look!';}
+    else if(pct>0){status='يحتاج مراجعة 📚'; advice='أعد قراءة البطاقات والخط الزمني ثم أعد الاختبار.';}
+  }
+  document.getElementById('dashStatus').textContent = status;
+  document.getElementById('dashAdvice').textContent = advice;
+  // history
+  const hist = document.getElementById('historyList');
+  if(totalAns===0){
+    hist.innerHTML='<p class="text-sm text-slate-500 font-semibold col-span-2 text-center py-8 bg-slate-50 rounded-2xl border border-dashed border-slate-200">لا يوجد سجل بعد — أجب على الأسئلة ليظهر التحليل هنا مع الشرح لكل سؤال.</p>';
+  } else {
+    hist.innerHTML = questions.map((q,i)=>{
+      const a = answers[i];
+      if(!a) return `<div class="bg-slate-50 border border-dashed border-slate-200 rounded-2xl p-4 flex items-center gap-3 opacity-60"><span class="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center font-black text-xs">${i+1}</span><p class="text-xs font-bold">لم تجب بعد</p></div>`;
+      return `<div class="rounded-2xl border-2 p-3 flex gap-3 ${a.correct?'bg-emerald-50 border-emerald-200':'bg-rose-50 border-rose-200'}">
+        <div class="w-8 h-8 rounded-full flex items-center justify-center text-white shrink-0 ${a.correct?'bg-emerald-500':'bg-rose-500'}"><i class="fa-solid ${a.correct?'fa-check':'fa-xmark'} text-xs"></i></div>
+        <div class="flex-1 min-w-0">
+          <p class="font-en font-bold text-xs leading-5 text-slate-900 truncate">${q.q}</p>
+          <p class="text-[11px] font-bold ${a.correct?'text-emerald-700':'text-rose-700'}">اخترت: ${q.opts[a.idx]} — ${a.correct?'صحيح':'خطأ'} • الإجابة: ${q.opts[q.ans]}</p>
+          <p class="text-[11px] text-slate-600 leading-4 mt-1">${q.exp}</p>
+        </div>
+        <button onclick="speakText('${q.ex.replace(/'/g,"\\'")}', 'en-US')" class="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center shrink-0"><i class="fa-solid fa-volume-high text-xs"></i></button>
+      </div>`;
+    }).join('');
+  }
+  updateCharts();
+}
+
+// ----- Toast -----
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  t.classList.remove('hidden'); t.classList.add('flex');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{t.classList.add('hidden'); t.classList.remove('flex')},2200);
+}
+
+// ----- Init -----
+window.addEventListener('DOMContentLoaded', ()=>{
+  renderCards();
+  initQuizChart();
+  initCharts();
+  renderQuestion();
+  updateScores();
+  updateDashboard();
+  setTimeline('simple');
+  // expose old function names from prompt for compatibility
+  window.speakPresentSimple = ()=> speakText('She drinks coffee every morning. This is Present Simple.', 'en-US');
+  window.speakPresentContinuous = ()=> speakText('She is drinking coffee right now. This is Present Continuous.', 'en-US');
+});
+</script>
+</body>
+</html>
